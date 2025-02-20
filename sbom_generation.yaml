@@ -28,14 +28,36 @@ steps:
   - type: Command
     name: "Generate SBOM for Python "
     command: |
+      cd wind
       # Search the test or dev requirements files, so that test and dev py packages can be excluded in the generated SBOM
       files=$(find . -type f -regex ".*\(test.*requirements\|requirements.*test\|dev.*requirements\|requirements.*dev\).*\.txt") && \
       if [ -n "$files" ]; then \
-        cdxgen -t python -o artifactSBOM.json --spec-version 1.4 \
+        cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 \
         --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
       else \
-         cdxgen -t python -o artifactSBOM.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+         cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
       fi \
+    command: |
+      cd wind-oci-marketplace
+      # Search the test or dev requirements files, so that test and dev py packages can be excluded in the generated SBOM
+      files=$(find . -type f -regex ".*\(test.*requirements\|requirements.*test\|dev.*requirements\|requirements.*dev\).*\.txt") && \
+      if [ -n "$files" ]; then \
+        cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 \
+        --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+      else \
+         cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+      fi \
+  - type: Command
+    name: "Download CycloneDx-linux-cli executable and install dependencies"
+    command: |
+      wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.24.2/cyclonedx-linux-x64
+      yum install -y libicu
+  - type: Command
+    name: "Merge multiple SBOMs using CycloneDX-linux-cli"
+    command: |
+      # For more details, visit https://github.com/CycloneDX/cyclonedx-cli/blob/main/README.md
+      chmod +x cyclonedx-linux-x64
+      ./cyclonedx-linux-x64 merge --input-files ${OCI_PRIMARY_SOURCE_DIR}/artifactSBOM_wind.json ${OCI_PRIMARY_SOURCE_DIR}/artifactSBOM_wind_oci.json --output-file artifactSBOM.json
 outputArtifacts:
   - name: artifactSBOM
     type: BINARY
