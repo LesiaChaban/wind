@@ -33,9 +33,9 @@ steps:
       files=$(find . -type f -regex ".*\(test.*requirements\|requirements.*test\|dev.*requirements\|requirements.*dev\).*\.txt") && \
       if [ -n "$files" ]; then \
         cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 \
-        --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+        --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "../wind" --no-recurse
       else \
-         cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+         cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 --project-name "../wind" --no-recurse
       fi \
       cd ..
     command: |
@@ -44,9 +44,9 @@ steps:
       files=$(find . -type f -regex ".*\(test.*requirements\|requirements.*test\|dev.*requirements\|requirements.*dev\).*\.txt") && \
       if [ -n "$files" ]; then \
         cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 \
-        --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+        --exclude "*{requirements,dev,test}*{requirements,dev,test}*.txt" --project-name "../wind-oci-marketplace" --no-recurse
       else \
-         cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
+         cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 --project-name "../wind-oci-marketplace" --no-recurse
       fi \
       cd ..
   - type: Command
@@ -59,7 +59,7 @@ steps:
     command: |
       # For more details, visit https://github.com/CycloneDX/cyclonedx-cli/blob/main/README.md
       chmod +x cyclonedx-linux-x64
-      ./cyclonedx-linux-x64 merge --input-files ${OCI_PRIMARY_SOURCE_DIR}/artifactSBOM_wind.json ${OCI_PRIMARY_SOURCE_DIR}/artifactSBOM_wind_oci.json --output-file artifactSBOM.json
+      ./cyclonedx-linux-x64 merge --input-files wind/artifactSBOM_wind.json wind-oci-marketplace/artifactSBOM_wind_oci.json --output-file artifactSBOM.json
 outputArtifacts:
   - name: artifactSBOM
     type: BINARY
