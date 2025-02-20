@@ -37,6 +37,7 @@ steps:
       else \
          cdxgen -t python -o artifactSBOM_wind.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
       fi \
+      cd ..
     command: |
       cd wind-oci-marketplace
       # Search the test or dev requirements files, so that test and dev py packages can be excluded in the generated SBOM
@@ -47,6 +48,7 @@ steps:
       else \
          cdxgen -t python -o artifactSBOM_wind_oci.json --spec-version 1.4 --project-name "$(basename $OCI_PRIMARY_SOURCE_URL)" --no-recurse
       fi \
+      cd ..
   - type: Command
     name: "Download CycloneDx-linux-cli executable and install dependencies"
     command: |
